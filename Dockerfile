@@ -15,6 +15,7 @@ RUN dnf update --quiet -y \
   libexif \
   nodejs \
   rsync \
+  rubygem-bundler \
   sudo \
   systemd-devel \
   unzip \
