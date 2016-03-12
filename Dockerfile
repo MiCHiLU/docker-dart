@@ -2,6 +2,7 @@ FROM michilu/fedora-zero
 # Switch to dnf.
 RUN yum install --setopt=rawhide.skip_if_unavailable=true --quiet -y dnf && dnf clean all
 # Install commands.
+# sudo needed by Wercker CI
 # For chrome installation.
 # libX11.so.6 in libexif needed by google-chrome
 # libudev.so.0 in systemd-devel needed by chromium
@@ -14,6 +15,7 @@ RUN dnf update --quiet -y \
   libexif \
   nodejs \
   rsync \
+  sudo \
   systemd-devel \
   unzip \
   xorg-x11-server-Xvfb \
