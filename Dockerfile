@@ -10,12 +10,18 @@ ADD google-chrome.repo etc/yum.repos.d/
 RUN dnf update --quiet -y \
   && rpm --quiet --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-24-primary \
   && dnf install --quiet -y \
+  coffee-script \
   findutils \
+  git \
   google-chrome-unstable \
   libexif \
-  nodejs \
+  npm \
   rsync \
   rubygem-bundler \
+  rubygem-coffee-script \
+  rubygem-compass \
+  rubygem-haml \
+  rubygem-sass \
   sudo \
   systemd-devel \
   unzip \
