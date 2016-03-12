@@ -18,7 +18,9 @@ RUN dnf update --quiet -y \
   unzip \
   xorg-x11-server-Xvfb \
   zip \
-  && dnf clean all
+  && dnf clean all \
+  && mkdir /run/dbus \
+  && (cd /usr/lib64 && ln -s libudev.so.1 libudev.so.0)
 
 # Export variables
 WORKDIR $HOME
