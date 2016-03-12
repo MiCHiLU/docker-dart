@@ -12,9 +12,12 @@ RUN dnf update --quiet -y \
   findutils \
   google-chrome-unstable \
   libexif \
+  nodejs \
+  rsync \
   systemd-devel \
   unzip \
   xorg-x11-server-Xvfb \
+  zip \
   && dnf clean all
 
 # Export variables
