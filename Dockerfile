@@ -34,3 +34,14 @@ RUN \
   && unzip -qq "dartium-linux-x64-release.zip" \
   && mv `find . -name "dartium-lucid64-full-stable*" -type d|head -1` $HOME/chromium \
   && rm "dartium-linux-x64-release.zip"
+
+# For test
+# Display installed versions.
+#CMD test -d $DART_SDK || { ls -a $HOME ; echo "dart-sdk directory not found at $DART_SDK, terminating."; exit 1; } \
+#  && type dart || { echo "PATH: $PATH"; echo "dart command not availble after installation, terminating."; exit 1; } \
+#  && type pub || { echo "PATH: $PATH"; echo "pub command not availble after installation, terminating."; exit 1; } \
+#  && echo "test: OK." \
+#  && chromium/chrome --version \
+#  && google-chrome --version \
+#  && dbus-daemon --system --fork \
+#  && xvfb-run google-chrome --disable-gpu
