@@ -1,18 +1,19 @@
 FROM michilu/fedora-zero
 # Switch to dnf
 RUN yum install --setopt=rawhide.skip_if_unavailable=true --quiet -y dnf && dnf clean all
-# For chrome installation.
-# libX11.so.6 needed by google-chrome
-ADD google-chrome.repo etc/yum.repos.d/
 # Install commands
+# For chrome installation.
+# libX11.so.6 in libexif needed by google-chrome
+ADD google-chrome.repo etc/yum.repos.d/
 RUN dnf update --quiet -y \
   && rpm --quiet --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-24-primary \
-  &&  dnf install --quiet -y \
+  && dnf install --quiet -y \
   google-chrome-unstable \
   libexif \
   unzip \
   xorg-x11-server-Xvfb \
   && dnf clean all
+
 # Export variables
 WORKDIR $HOME
 ENV DISPLAY=:99 DART_SDK="$HOME/dart-sdk" PATH="$PATH:$HOME/dart-sdk/bin" DART_VERSION="1.14.0"
