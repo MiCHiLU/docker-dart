@@ -32,5 +32,5 @@ RUN \
   && rm "dartsdk-linux-x64-release.zip" \
   && curl --silent --remote-name "http://storage.googleapis.com/dart-archive/channels/stable/release/$DART_VERSION/dartium/dartium-linux-x64-release.zip" \
   && unzip -qq "dartium-linux-x64-release.zip" \
-  && mv `find . -name "dartium-lucid64-full-stable*" -type d|head -1` $DART_SDK/../chromium \
+  && mv `find . -name "dartium-lucid64-full-stable*" -type d|head -1` $HOME/chromium \
   && rm "dartium-linux-x64-release.zip"
