@@ -30,7 +30,7 @@ RUN dnf update --quiet -y \
 
 # Export variables.
 WORKDIR $HOME
-ENV DISPLAY=:99 DART_SDK="$HOME/dart-sdk" PATH="$PATH:$HOME/dart-sdk/bin" DART_VERSION="1.17.0"
+ENV DISPLAY=:99 DART_SDK="$HOME/dart-sdk" PATH="$PATH:$HOME/dart-sdk/bin" DART_VERSION="1.17.1"
 
 # For chrome installation.
 # Install Dart SDK and Dartium
