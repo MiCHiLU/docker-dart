@@ -25,6 +25,10 @@ RUN dnf update --quiet -y \
 ENV HOME="/"
 WORKDIR $HOME
 
+# Install npm packages.
+ADD package.json $HOME
+RUN npm install && npm prune && rm package.json
+
 # Export variables.
 ENV DART_VERSION="1.18.1" DART_SDK="${HOME}dart-sdk" PATH="${PATH}:${HOME}dart-sdk/bin"
 
