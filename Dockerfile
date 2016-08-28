@@ -1,6 +1,6 @@
 FROM michilu/fedora-zero
 # Switch to dnf.
-RUN yum install --setopt=rawhide.skip_if_unavailable=true --quiet -y dnf && dnf clean all
+RUN yum install --setopt=rawhide.skip_if_unavailable=true --quiet -y dnf && dnf autoremove && dnf clean all
 # Install commands.
 # sudo needed by Wercker CI
 RUN dnf update --quiet -y \
@@ -19,7 +19,7 @@ RUN dnf update --quiet -y \
   sudo \
   unzip \
   zip \
-  && dnf clean all
+  && dnf autoremove && dnf clean all
 
 # Set $HOME variable.
 ENV HOME="/"
