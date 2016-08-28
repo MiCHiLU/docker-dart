@@ -36,7 +36,7 @@ RUN dnf update --quiet -y \
 
 # For test.
 # Display installed versions.
-#CMD test -d ${DART_SDK} || { ls -a ${HOME} ; echo "dart-sdk directory not found at ${DART_SDK}, terminating."; exit 1; } \
-#  && type dart || { echo "PATH: ${PATH}"; echo "dart command not availble after installation, terminating."; exit 1; } \
-#  && type pub || { echo "PATH: ${PATH}"; echo "pub command not availble after installation, terminating."; exit 1; } \
-#  && echo "test: OK."
+CMD test -d ${DART_SDK} || { ls -a ${HOME} ; echo "dart-sdk directory not found at ${DART_SDK}, terminating."; exit 1; } \
+  && type dart && dart --version || { echo "PATH: ${PATH}"; echo "dart command not availble after installation, terminating."; exit 1; } \
+  && type pub && pub --version || { echo "PATH: ${PATH}"; echo "pub command not availble after installation, terminating."; exit 1; } \
+  && echo "test: OK."
