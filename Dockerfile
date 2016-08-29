@@ -21,10 +21,12 @@ RUN dnf update --quiet -y \
   zip \
   && dnf clean all
 
-# Export variables.
+# Set $HOME variable.
 ENV HOME="/"
 WORKDIR $HOME
-ENV DART_SDK="${HOME}dart-sdk" PATH="${PATH}:${HOME}dart-sdk/bin" DART_VERSION="1.18.1"
+
+# Export variables.
+ENV DART_VERSION="1.18.1" DART_SDK="${HOME}dart-sdk" PATH="${PATH}:${HOME}dart-sdk/bin"
 
 # Install Dart SDK.
 RUN dnf update --quiet -y \
