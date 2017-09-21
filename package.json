@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "coffee-script": "*",
-    "uglify-js": "*"
-  },
-  "private": true
-}
