@@ -1,52 +1,69 @@
-FROM michilu/docker-web-essentials
+FROM node:0.10.48-slim
 
-ENV PATH="${PATH}:${HOME}/dart-sdk/bin"
+ENV \
+  LANG="C" \
+  LANGUAGE="C" \
+  LC_ALL="C" \
+  LC_CTYPE="C" \
+  PATH="/usr/lib/dart/bin:$HOME/node_modules/.bin:$PATH"
 
-# https://github.com/frol/docker-alpine-glibc/blob/master/Dockerfile
-RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
-    ALPINE_GLIBC_PACKAGE_VERSION="2.25-r0" && \
-    ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
-    ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
-    ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
-    apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
-    wget \
-        "https://raw.githubusercontent.com/andyshinn/alpine-pkg-glibc/master/sgerrand.rsa.pub" \
-        -O "/etc/apk/keys/sgerrand.rsa.pub" && \
-    wget \
-        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
-    apk add --no-cache \
-        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
-    \
-    rm "/etc/apk/keys/sgerrand.rsa.pub" && \
-    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true && \
-    echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
-    \
-    apk del glibc-i18n && \
-    \
-    rm "/root/.wget-hsts" && \
-    apk del .build-dependencies && \
-    rm \
-        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
-        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+WORKDIR $HOME/
 
-RUN apk --no-cache --update add \
+# for Ruby gem
+ADD gemrc /etc/
+# pre install
+ADD Gemfile $HOME/
+ADD package.json $HOME/
+
+# bash and curl needed by the steps on Wercker CI
+# ruby, ruby-dev, and ruby-io-console needed by gem
+RUN apt-get -q update && apt-get install --no-install-recommends -y -q \
+  apt-transport-https \
+  git \
+  make \
+  python \
+  #python-dev \
+  rsync \
+  ruby-coffee-script \
+  ruby-coffee-script-source \
+  ruby-compass \
+  ruby-json \
+  ruby-sass \
+  #ruby-io-console \
+  sudo \
   zip \
+  && rm -rf /var/lib/apt/lists/* \
+# for Python PIP
+  && curl -s https://bootstrap.pypa.io/get-pip.py | python \
+# for Ruby gem
+  && gem install \
+  bundler \
+  && rm -r $HOME/.gem \
+  && find / -type f -name "*.gem" -delete \
+# pre install
+  && npm install \
+  && rm package.json \
+  && bundle install \
+  && rm Gemfile* \
+# for Dart
+  && curl -s https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+  && curl -s https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list \
+  && curl -s https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_unstable.list > /etc/apt/sources.list.d/dart_unstable.list \
   ;
 
-RUN dart_version="1.24.2" \
-  ; curl --silent --remote-name "https://storage.googleapis.com/dart-archive/channels/stable/release/${dart_version}/sdk/dartsdk-linux-x64-release.zip" \
-  && apk add --no-cache --virtual=.build-dependencies unzip \
-  && unzip -qq "dartsdk-linux-x64-release.zip" \
-  && apk del .build-dependencies \
-  && rm "dartsdk-linux-x64-release.zip" \
+RUN \
+  dart_version="1.24.2" \
+  ; apt-get -q update && apt-get install --no-install-recommends -y -q dart=${dart_version}-1 \
+  && rm -rf /var/lib/apt/lists/* \
   ;
 
-CMD test -d ${HOME}/dart-sdk || { ls -a ${HOME} ; echo "dart-sdk directory not found at ${HOME}/dart-sdk, terminating."; exit 1; } \
-  && type dart && dart --version || { echo "PATH: ${PATH}"; echo "dart command not availble after installation, terminating."; exit 1; } \
-  && type pub && pub --version || { echo "PATH: ${PATH}"; echo "pub command not availble after installation, terminating."; exit 1; } \
-  && echo "test: OK."
+CMD echo "Versions..."\
+  && type coffee && coffee --version \
+  && type compass && compass --version \
+  && type haml && haml --version \
+  && type sass && sass --version \
+  && type uglifyjs && uglifyjs --version \
+  && type dart && dart --version \
+  && type pub && pub --version \
+  && echo "OK." \
+  ;
