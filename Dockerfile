@@ -1,46 +1,52 @@
-FROM michilu/fedora-zero
-# Switch to dnf.
-RUN yum install --setopt=rawhide.skip_if_unavailable=true --quiet -y dnf && dnf autoremove && dnf clean all
-# Install commands.
-# sudo needed by Wercker CI
-RUN dnf update --quiet -y \
-  && rpm --quiet --import /etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-24-primary \
-  && dnf install --quiet -y \
-  coffee-script \
-  findutils \
-  git \
-  npm \
-  rsync \
-  rubygem-bundler \
-  rubygem-coffee-script \
-  rubygem-compass \
-  rubygem-haml \
-  rubygem-sass \
-  sudo \
-  unzip \
+FROM michilu/docker-web-essentials
+
+ENV PATH="${PATH}:${HOME}/dart-sdk/bin"
+
+# https://github.com/frol/docker-alpine-glibc/blob/master/Dockerfile
+RUN ALPINE_GLIBC_BASE_URL="https://github.com/sgerrand/alpine-pkg-glibc/releases/download" && \
+    ALPINE_GLIBC_PACKAGE_VERSION="2.25-r0" && \
+    ALPINE_GLIBC_BASE_PACKAGE_FILENAME="glibc-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    ALPINE_GLIBC_BIN_PACKAGE_FILENAME="glibc-bin-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    ALPINE_GLIBC_I18N_PACKAGE_FILENAME="glibc-i18n-$ALPINE_GLIBC_PACKAGE_VERSION.apk" && \
+    apk add --no-cache --virtual=.build-dependencies wget ca-certificates && \
+    wget \
+        "https://raw.githubusercontent.com/andyshinn/alpine-pkg-glibc/master/sgerrand.rsa.pub" \
+        -O "/etc/apk/keys/sgerrand.rsa.pub" && \
+    wget \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BASE_URL/$ALPINE_GLIBC_PACKAGE_VERSION/$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+    apk add --no-cache \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME" && \
+    \
+    rm "/etc/apk/keys/sgerrand.rsa.pub" && \
+    /usr/glibc-compat/bin/localedef --force --inputfile POSIX --charmap UTF-8 C.UTF-8 || true && \
+    echo "export LANG=C.UTF-8" > /etc/profile.d/locale.sh && \
+    \
+    apk del glibc-i18n && \
+    \
+    rm "/root/.wget-hsts" && \
+    apk del .build-dependencies && \
+    rm \
+        "$ALPINE_GLIBC_BASE_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_BIN_PACKAGE_FILENAME" \
+        "$ALPINE_GLIBC_I18N_PACKAGE_FILENAME"
+
+RUN apk --no-cache --update add \
   zip \
-  && dnf autoremove && dnf clean all
+  ;
 
-# Set $HOME variable.
-ENV HOME="/"
-WORKDIR $HOME
-
-# Install npm packages.
-ADD package.json $HOME
-RUN npm install && npm prune && rm package.json
-
-# Export variables.
-ENV DART_VERSION="1.18.1" DART_SDK="${HOME}dart-sdk" PATH="${PATH}:${HOME}dart-sdk/bin"
-
-# Install Dart SDK.
-RUN dnf update --quiet -y \
-  && curl --silent --remote-name "http://storage.googleapis.com/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip" \
+RUN dart_version="1.24.2" \
+  ; curl --silent --remote-name "https://storage.googleapis.com/dart-archive/channels/stable/release/${dart_version}/sdk/dartsdk-linux-x64-release.zip" \
+  && apk add --no-cache --virtual=.build-dependencies unzip \
   && unzip -qq "dartsdk-linux-x64-release.zip" \
-  && rm "dartsdk-linux-x64-release.zip"
+  && apk del .build-dependencies \
+  && rm "dartsdk-linux-x64-release.zip" \
+  ;
 
-# For test.
-# Display installed versions.
-CMD test -d ${DART_SDK} || { ls -a ${HOME} ; echo "dart-sdk directory not found at ${DART_SDK}, terminating."; exit 1; } \
+CMD test -d ${HOME}/dart-sdk || { ls -a ${HOME} ; echo "dart-sdk directory not found at ${HOME}/dart-sdk, terminating."; exit 1; } \
   && type dart && dart --version || { echo "PATH: ${PATH}"; echo "dart command not availble after installation, terminating."; exit 1; } \
   && type pub && pub --version || { echo "PATH: ${PATH}"; echo "pub command not availble after installation, terminating."; exit 1; } \
   && echo "test: OK."
