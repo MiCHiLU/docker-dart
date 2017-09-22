@@ -60,8 +60,8 @@ RUN \
 CMD echo "Versions..."\
   && type coffee && coffee --version \
   && type compass && compass --version \
-  && type haml && haml --version \
   && type sass && sass --version \
+  && type slimrb && slimrb --version \
   && type uglifyjs && uglifyjs --version \
   && type dart && dart --version \
   && type pub && pub --version \
