@@ -9,27 +9,22 @@ ENV \
 
 WORKDIR $HOME/
 
-# for Ruby gem
 ADD gemrc /etc/
-# pre install
 ADD Gemfile $HOME/
 ADD package.json $HOME/
 
 # bash and curl needed by the steps on Wercker CI
-# ruby, ruby-dev, and ruby-io-console needed by gem
 RUN apt-get -q update && apt-get install --no-install-recommends -y -q \
   apt-transport-https \
   git \
   make \
   python \
-  #python-dev \
   rsync \
   ruby-coffee-script \
   ruby-coffee-script-source \
   ruby-compass \
   ruby-json \
   ruby-sass \
-  #ruby-io-console \
   sudo \
   zip \
   && rm -rf /var/lib/apt/lists/* \
