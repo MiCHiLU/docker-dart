@@ -46,9 +46,10 @@ RUN apt-get -q update && apt-get install --no-install-recommends -y -q \
   #&& curl -s https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_unstable.list > /etc/apt/sources.list.d/dart_unstable.list \
   ;
 
-RUN \
-  dart_version="1.24.2" \
-  ; apt-get -q update && apt-get install --no-install-recommends -y -q dart=${dart_version}-1 \
+ARG \
+  dart="1.24.2"
+
+RUN apt-get -q update && apt-get install --no-install-recommends -y -q dart=${dart}-1 \
   && rm -rf /var/lib/apt/lists/* \
   ;
 
