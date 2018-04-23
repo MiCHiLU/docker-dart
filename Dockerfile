@@ -42,12 +42,14 @@ RUN apt-get -q update && apt-get install --no-install-recommends -y -q \
   && rm Gemfile* \
 # for Dart
   && curl -s https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-  && curl -s https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list \
-  #&& curl -s https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_unstable.list > /etc/apt/sources.list.d/dart_unstable.list \
+  && (cd /etc/apt/sources.list.d \
+  && curl -sO https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list \
+  && curl -sO https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_unstable.list \
+  ) \
   ;
 
 ARG \
-  dart="1.24.3"
+  dart="2.0.0-dev.46.0"
 
 RUN apt-get -q update && apt-get install --no-install-recommends -y -q dart=${dart}-1 \
   && rm -rf /var/lib/apt/lists/* \
