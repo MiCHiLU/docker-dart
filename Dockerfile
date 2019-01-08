@@ -32,7 +32,7 @@ RUN apt-get -q update && apt-get install --no-install-recommends -y -q \
   && curl -s https://bootstrap.pypa.io/get-pip.py | python \
 # for Ruby gem
   && gem install \
-  bundler \
+  bundler -v "~> 1" \
   && rm -r $HOME/.gem \
   && find / -type f -name "*.gem" -delete \
 # pre install
