@@ -50,7 +50,7 @@ RUN apt-get -q update && apt-get install --no-install-recommends -y -q \
   ;
 
 ARG \
-  dart="2.1.0"
+  dart="2.1.1"
 
 RUN apt-get -q update && apt-get install --no-install-recommends -y -q dart=${dart}-1 \
   && rm -rf /var/lib/apt/lists/* \
