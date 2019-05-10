@@ -1,4 +1,5 @@
 FROM node:0.10.48-slim
+RUN sed -i '/jessie-updates/d' /etc/apt/sources.list  # Now archived
 
 ENV \
   LANG="C" \
